@@ -4,14 +4,50 @@ import (
 	"archive/zip"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/campoy/unique"
 )
 
 var urls []string
+var wg sync.WaitGroup
+
+func URLCheck(urls []string) {
+	statuses := make(chan string)
+	wg.Add(len(urls))
+
+	for _, url := range urls {
+		go func(url string) {
+			defer wg.Done()
+
+			timeout := time.Duration(10 * time.Second)
+			client := http.Client{
+				Timeout: timeout,
+			}
+			resp, err := client.Get(url)
+
+			if err != nil {
+				statuses <- fmt.Sprintf("%s\tNetwork Error", url)
+			} else {
+				statuses <- fmt.Sprintf("%s\t%s", url, resp.Status)
+			}
+		}(url)
+
+	}
+	go func() {
+		for status := range statuses {
+			fmt.Println(status)
+		}
+	}()
+
+	wg.Wait()
+
+}
 
 func main() {
 
@@ -43,8 +79,5 @@ func main() {
 	less := func(i, j int) bool { return urls[i] != urls[j] }
 	unique.Slice(&urls, less)
 
-	for _, url := range urls {
-		fmt.Println(url)
-	}
-
+	URLCheck(urls)
 }
