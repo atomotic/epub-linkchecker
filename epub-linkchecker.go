@@ -25,9 +25,8 @@ func URLCheck(urls []string) {
 		go func(url string) {
 			defer wg.Done()
 
-			timeout := time.Duration(10 * time.Second)
 			client := http.Client{
-				Timeout: timeout,
+				Timeout: time.Duration(30 * time.Second),
 			}
 			resp, err := client.Get(url)
 
@@ -51,6 +50,11 @@ func URLCheck(urls []string) {
 
 func main() {
 
+	if len(os.Args) < 2 {
+		fmt.Println("USAGE: epub-linkchecker {file.epub}")
+		os.Exit(1)
+	}
+
 	r, err := zip.OpenReader(os.Args[1])
 	if err != nil {
 		log.Fatal(err)
@@ -60,10 +64,10 @@ func main() {
 	for _, f := range r.File {
 		if strings.HasSuffix(f.Name, "html") {
 
-			rc, err := f.Open()
-			defer rc.Close()
+			page, err := f.Open()
+			defer page.Close()
 
-			doc, err := goquery.NewDocumentFromReader(rc)
+			doc, err := goquery.NewDocumentFromReader(page)
 			if err != nil {
 				log.Fatal(err)
 			}
