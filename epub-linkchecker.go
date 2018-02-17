@@ -31,9 +31,9 @@ func URLCheck(urls []string) {
 			resp, err := client.Get(url)
 
 			if err != nil {
-				statuses <- fmt.Sprintf("%s\tNetwork Error", url)
+				statuses <- fmt.Sprintf("Unreachable\t%s", url)
 			} else {
-				statuses <- fmt.Sprintf("%s\t%s", url, resp.Status)
+				statuses <- fmt.Sprintf("%s\t%s", resp.Status, url)
 			}
 		}(url)
 
@@ -80,7 +80,7 @@ func main() {
 		}
 	}
 
-	less := func(i, j int) bool { return urls[i] != urls[j] }
+	less := func(i, j int) bool { return urls[i] < urls[j] }
 	unique.Slice(&urls, less)
 
 	URLCheck(urls)
