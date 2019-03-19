@@ -12,4 +12,4 @@ Download a [binary](https://github.com/atomotic/epub-linkchecker/releases) or us
 
 	$ epub-linkchecker {file.epub}
 	
-[![asciicast](https://asciinema.org/a/TENoY7sPvZAv7U4a30jiI22Uu.png)](https://asciinema.org/a/TENoY7sPvZAv7U4a30jiI22Uu)
+[![asciicast](https://asciinema.org/a/234915.svg)](https://asciinema.org/a/234915)
